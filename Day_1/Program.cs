@@ -5,7 +5,7 @@ Regex numRegex = new(@"\d");
 var stringInputs = new InputProvider<string?>("Input.txt", GetString).Where(w => w != null).Cast<string>().ToList();
 
 Console.WriteLine("Part 1: " + ProcessInput(stringInputs, str => numRegex.Matches(str).Select(w => int.Parse(w.Value)).ToList()));
-Console.WriteLine("Part 2: " + ProcessInput(stringInputs, GetAllNumbers));
+Console.WriteLine("Part 2: " + ProcessInput(stringInputs, GetFirstAndLastNumbers));
 
 int ProcessInput(IEnumerable<string> input, Func<string, IEnumerable<int>> func)
 {
@@ -23,7 +23,7 @@ int ProcessInput(IEnumerable<string> input, Func<string, IEnumerable<int>> func)
     return totalSum;
 }
 
-IEnumerable<int> GetAllNumbers(string str)
+IEnumerable<int> GetFirstAndLastNumbers(string str)
 {
     var matches = new (string, int)[]
     { 
