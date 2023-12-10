@@ -49,12 +49,13 @@ namespace SantasToolbox
         private readonly Dictionary<Point, Tile> allTiles = new();
         private readonly bool allowDiagnoalNeighbours;
         private readonly Func<int, int, char, Func<Tile, IEnumerable<Tile>>, Tile> tileCreatingFunc;
+        private readonly Func<Tile, Tile, bool> isValidNeighbourFunc;
 
         private readonly Cached<int> cachedMaxX;
         private readonly Cached<int> cachedMaxY;
         private readonly Cached<int> cachedMinX;
         private readonly Cached<int> cachedMinY;
-
+        
         public int MaxX => this.cachedMaxX.Value;
         public int MaxY => this.cachedMaxY.Value;
         public int MinX => this.cachedMinX.Value;
@@ -64,10 +65,11 @@ namespace SantasToolbox
 
         public char UnknownTileChar { get; set; } = ' ';
 
-        public TileWorld(IEnumerable<string> map, bool allowDiagnoalNeighbours, Func<int, int, char, Func<Tile, IEnumerable<Tile>>, Tile> tileCreatingFunc)
+        public TileWorld(IEnumerable<string> map, bool allowDiagnoalNeighbours, Func<int, int, char, Func<Tile, IEnumerable<Tile>>, Tile> tileCreatingFunc, Func<Tile, Tile, bool> isValidNeighbourFunc = null)
         {
             this.allowDiagnoalNeighbours = allowDiagnoalNeighbours;
             this.tileCreatingFunc = tileCreatingFunc;
+            this.isValidNeighbourFunc = isValidNeighbourFunc ?? ((a, b) => true);
 
             int y = 0;
             foreach (var line in map)
@@ -126,7 +128,7 @@ namespace SantasToolbox
                 (p1, p2) => p1.IsNeighbour(p2);
 
             return this.allTiles.Values.Where(w => w.IsTraversable &&
-                neighbourFunc(w.Position, tile.Position));
+                neighbourFunc(w.Position, tile.Position) && this.isValidNeighbourFunc(tile, w));
         }
     }
 }
