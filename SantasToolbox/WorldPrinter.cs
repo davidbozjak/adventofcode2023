@@ -78,6 +78,15 @@ public class WorldPrinter
         }
     }
 
+    public string PrintToString(IWorld world)
+    {
+        var stringBuilder = new StringBuilder();
+
+        Print(world, w => stringBuilder.AppendLine(w));
+
+        return stringBuilder.ToString();
+    }
+
     private void Print(IWorld world, IWorldObject objectOfInterest, Action<string> printLineFunc)
     {
         Print(world, objectOfInterest.Position.X - frameSize, objectOfInterest.Position.X + frameSize, objectOfInterest.Position.Y - frameSize, objectOfInterest.Position.Y + frameSize, printLineFunc);

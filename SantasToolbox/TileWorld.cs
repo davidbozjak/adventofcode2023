@@ -5,7 +5,7 @@ namespace SantasToolbox
     [System.Diagnostics.DebuggerDisplay("({Position.X}, {Position.Y})")]
     public class Tile : IWorldObject, INode, IEquatable<Tile>
     {
-        public Point Position { get; }
+        public Point Position { get; private set; }
         
         public virtual char CharRepresentation => this.IsTraversable ? '.' : '#';
 
@@ -24,6 +24,11 @@ namespace SantasToolbox
             Position = new Point(x, y);
             this.IsTraversable = isTraversable;
             this.cachedNeighbours = new Cached<IEnumerable<Tile>>(() => fillTraversibleNeighboursFunc(this).ToList());
+        }
+
+        public void Move(int x, int y)
+        {
+            this.Position = new Point(x, y);
         }
 
         public bool Equals(Tile? other)
@@ -46,7 +51,7 @@ namespace SantasToolbox
 
     public class TileWorld : IWorld
     {
-        private readonly Dictionary<Point, Tile> allTiles = new();
+        protected readonly Dictionary<Point, Tile> allTiles = new();
         private readonly bool allowDiagnoalNeighbours;
         private readonly Func<int, int, char, Func<Tile, IEnumerable<Tile>>, Tile> tileCreatingFunc;
         private readonly Func<Tile, Tile, bool> isValidNeighbourFunc;
