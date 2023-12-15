@@ -9,8 +9,9 @@ var singleDigitIntInput = new InputProvider<int>("Input.txt", singleDigitIntPars
 var wholeStringConvertInput = new InputProvider<string?>("Input.txt", GetString).Where(w => w != null).Cast<string>().ToList();
 var wholeStringInput = new StringInputProvider("Input.txt");
 
-var commaSeperatedSingleLineParser = new SingleLineStringInputParser<int>(int.TryParse, str => str.Split(",", StringSplitOptions.RemoveEmptyEntries));
-var commaSeperatedIntsInput = new InputProvider<int>("Input.txt", commaSeperatedSingleLineParser.GetValue).ToList();
+var commaSeperatedSingleLineIntParser = new SingleLineStringInputParser<int>(int.TryParse, str => str.Split(",", StringSplitOptions.RemoveEmptyEntries));
+var commaSeperatedSingleLineStringParser = new SingleLineStringInputParser<string>(StringInputProvider.GetString, str => str.Split(",", StringSplitOptions.RemoveEmptyEntries));
+var commaSeperatedIntsInput = new InputProvider<int>("Input.txt", commaSeperatedSingleLineIntParser.GetValue).ToList();
 
 
 static bool GetString(string? input, out string? value)

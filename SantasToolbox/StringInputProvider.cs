@@ -6,7 +6,7 @@ public class StringInputProvider : InputProvider<string>
         :base(filePath, GetString)
     { }
 
-    static bool GetString(string? input, out string value)
+    public static bool GetString(string? input, out string value)
     {
         value = string.Empty;
 
