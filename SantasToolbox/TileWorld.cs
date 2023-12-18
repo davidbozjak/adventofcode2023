@@ -126,6 +126,8 @@ namespace SantasToolbox
         public Tile? GetTileAtOrNull(Point point) =>
             this.allTiles.ContainsKey(point) ? this.allTiles[point] : null;
 
+        public IEnumerable<Point> GetOccupiedPoints() => this.allTiles.Keys;
+
         private IEnumerable<Tile> GetTraversibleNeighboursOfTile(Tile tile)
         {
             Func<Point, Point, bool> neighbourFunc = this.allowDiagnoalNeighbours ?
