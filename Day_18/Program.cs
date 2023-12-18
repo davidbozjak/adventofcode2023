@@ -1,14 +1,66 @@
 ﻿using System.Drawing;
 using System.Globalization;
 
+// homemade approach
 var instructions = new InputProvider<Instruction?>("Input.txt", GetInstruction).Where(w => w != null).Cast<Instruction>().ToList();
+var flippedInstructions = new InputProvider<Instruction?>("Input.txt", GetInstructionFlipped).Where(w => w != null).Cast<Instruction>().ToList();
 
-var part1Lines = GetLinesFromInput(instructions);
-Console.WriteLine($"Part 1: {GetVolume(part1Lines, printProgress: false)}");
+Console.WriteLine($"Part 1: {GetVolume(GetLinesFromInput(instructions), printProgress: false)}");
 
-instructions = new InputProvider<Instruction?>("Input.txt", GetInstructionFlipped).Where(w => w != null).Cast<Instruction>().ToList();
-var part2Lines = GetLinesFromInput(instructions);
-Console.WriteLine($"Part 2: {GetVolume(part2Lines, printProgress: false)}");
+Console.WriteLine($"Part 2: {GetVolume(GetLinesFromInput(flippedInstructions), printProgress: false)}");
+
+// https://en.wikipedia.org/wiki/Shoelace_formula approach (learned about it after getting both stars):
+
+var points = GetPointsFromInput(flippedInstructions);
+
+long area2X = 0;
+long wallSize = flippedInstructions.Sum(w => w.Steps);
+
+for (int i = 0; i < points.Count; i++)
+{
+    var point = points[i];
+    var nextIndex = i + 1 == points.Count ? 0 : i + 1;
+    var nextPoint = points[nextIndex];
+
+    area2X += ((long)point.X * nextPoint.Y) - ((long)nextPoint.X * point.Y);
+}
+
+var area = area2X / 2;
+Console.WriteLine($"Part 2 - shoelace solution: {area + wallSize / 2 + 1}");
+
+static List<Point> GetPointsFromInput(List<Instruction> instructions)
+{
+    var current = new Point(0, 0);
+
+    var points = new List<Point>();
+
+    foreach (var instruction in instructions)
+    {
+        Point newPoz;
+        if (instruction.Direction == 'L')
+        {
+            newPoz = new Point(current.X - instruction.Steps, current.Y);
+        }
+        else if (instruction.Direction == 'R')
+        {
+            newPoz = new Point(current.X + instruction.Steps, current.Y);
+        }
+        else if (instruction.Direction == 'U')
+        {
+            newPoz = new Point(current.X, current.Y - instruction.Steps);
+        }
+        else if (instruction.Direction == 'D')
+        {
+            newPoz = new Point(current.X, current.Y + instruction.Steps);
+        }
+        else throw new Exception();
+
+        points.Add(newPoz);
+        current = newPoz;
+    }
+
+    return points;
+}
 
 static List<Line> GetLinesFromInput(List<Instruction> instructions)
 {
