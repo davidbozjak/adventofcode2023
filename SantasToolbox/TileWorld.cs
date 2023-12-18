@@ -17,7 +17,7 @@ namespace SantasToolbox
 
         public IEnumerable<Tile> TraversibleNeighbours => this.cachedNeighbours.Value;
 
-        public int Cost => 1;
+        public virtual int Cost => 1;
 
         public Tile(int x, int y, bool isTraversable, Func<Tile, IEnumerable<Tile>> fillTraversibleNeighboursFunc)
         {
