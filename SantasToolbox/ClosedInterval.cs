@@ -1,11 +1,14 @@
-﻿namespace SantasToolbox;
+﻿using System.Diagnostics;
 
+namespace SantasToolbox;
+
+[DebuggerDisplay("{Start} - {End} Length: {Length}")]
 public class ClosedInterval
 {
     public int Start { get; }
     public int End { get; }
 
-    public int Length => this.End - this.Start;
+    public int Length => this.End - this.Start + 1;
 
     public double CenterPoint => this.Start + (this.Length / 2.0);
 
@@ -46,5 +49,10 @@ public class ClosedInterval
             throw new Exception();
 
         return new ClosedInterval(Math.Max(this.Start, other.Start), Math.Min(this.End, other.End));
+    }
+
+    public override string ToString()
+    {
+        return $"{Start} - {End} Length: {Length}";
     }
 }
