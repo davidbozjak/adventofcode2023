@@ -29,7 +29,6 @@ if (calculatedValue != extrapolatedValue)
     throw new Exception("Predicted value not matching");
 
 Console.WriteLine($"Part 2: {GetExtrapolatedValue(repeats, results.ToArray())}");
-Console.ReadKey();
 
 int GetAllVisitedTilesForExactlySteps(int stepTarget)
 {
@@ -85,7 +84,6 @@ int GetAllVisitedTilesForExactlySteps(int stepTarget)
         }
     }
 
-    Console.WriteLine($"Steps: {stepTarget} Reachable tiles: {exactlyStepTarget.Count}");
     return exactlyStepTarget.Count;
 }
 
