@@ -27,7 +27,7 @@ namespace SantasToolbox
 
             public Point Position => pathObject.Position;
 
-            public char CharRepresentation => '*';
+            public char CharRepresentation => c;
 
             public int Z => int.MaxValue;
 
