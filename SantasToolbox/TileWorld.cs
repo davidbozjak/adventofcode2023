@@ -13,7 +13,7 @@ namespace SantasToolbox
 
         public bool IsTraversable { get; }
 
-        private readonly Cached<IEnumerable<Tile>> cachedNeighbours;
+        private readonly Cached<List<Tile>> cachedNeighbours;
 
         public IEnumerable<Tile> TraversibleNeighbours => this.cachedNeighbours.Value;
 
@@ -23,7 +23,7 @@ namespace SantasToolbox
         {
             Position = new Point(x, y);
             this.IsTraversable = isTraversable;
-            this.cachedNeighbours = new Cached<IEnumerable<Tile>>(() => fillTraversibleNeighboursFunc(this).ToList());
+            this.cachedNeighbours = new Cached<List<Tile>>(() => fillTraversibleNeighboursFunc(this).ToList());
         }
 
         public void Move(int x, int y)

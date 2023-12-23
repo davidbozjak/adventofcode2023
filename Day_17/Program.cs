@@ -51,9 +51,6 @@ bool Part2Validation(Direction direction, Direction? lastDirection, int countInS
 List<CostTile> FindPath(CostTile start, CostTile goal, Func<Direction, Direction?, int, bool> validateNextFunc, Func<Tile, Direction?, int, bool> validateFinalStateFunc)
 {
     PriorityQueue<State, int> queue = new();
-    // part 1:
-    //queue.Enqueue(new State(start, null, 0, 0), 0);
-    // part 2:
     queue.Enqueue(new State(start, Direction.Right, 1, 0), 0);
     queue.Enqueue(new State(start, Direction.Down, 1, 0), 0);
 
@@ -63,8 +60,6 @@ List<CostTile> FindPath(CostTile start, CostTile goal, Func<Direction, Direction
     };
 
     Dictionary<(CostTile, Direction?, int), (CostTile, Direction?, int)> cameFrom = new();
-
-    var results = new List<(List<CostTile>, int)>();
 
     while (queue.Count > 0)
     {
@@ -98,22 +93,6 @@ List<CostTile> FindPath(CostTile start, CostTile goal, Func<Direction, Direction
             {
                 continue;
             }
-
-            // part 1
-            //if (countSameDirection > 3)
-            //{
-            //    continue;
-            //}
-
-            // part 2:
-            //if (direction != lastDirection && current.countSameDirection < 4)
-            //{
-            //    continue;
-            //}
-            //else if (countSameDirection > 10)
-            //{
-            //    continue;
-            //}
 
             var key = ((CostTile)next, direction, countSameDirection);
 
