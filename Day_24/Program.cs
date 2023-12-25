@@ -44,6 +44,87 @@ for (int i = 0; i < hailParticles.Count; i++)
 
 Console.WriteLine($"Part 1: {countCollisionsWithinTestArea}");
 
+bool found = false;
+
+double? collisionX = null, collisionY = null, collisionZ = null;
+
+for (int maxRecordedSpeed = 200; !found; maxRecordedSpeed += 50)
+{
+    Console.WriteLine($"{DateTime.Now.TimeOfDay}: New cycle, now (-{maxRecordedSpeed}, {maxRecordedSpeed})");
+
+    for (int rock_Vx = -maxRecordedSpeed; rock_Vx < maxRecordedSpeed && !found; rock_Vx++)
+    {
+        for (int rock_Vy = -maxRecordedSpeed; rock_Vy < maxRecordedSpeed && !found; rock_Vy++)
+        {
+            for (int rock_Vz = -maxRecordedSpeed; rock_Vz < maxRecordedSpeed && !found; rock_Vz++)
+            {
+                var hailParticle1 = hailParticles[0];
+                var newHailParticle1 = new HailParticle(hailParticle1.X, hailParticle1.Y, hailParticle1.Z, hailParticle1.Vx - rock_Vx, hailParticle1.Vy - rock_Vy, hailParticle1.Vz - rock_Vz);
+
+                collisionX = collisionY = collisionZ = null;
+
+                found = true;
+
+                for (int i = 1; i < hailParticles.Count; i++)
+                {
+                    var hailParticle2 = hailParticles[i];
+                    var newHailParticle2 = new HailParticle(hailParticle2.X, hailParticle2.Y, hailParticle2.Z, hailParticle2.Vx - rock_Vx, hailParticle2.Vy - rock_Vy, hailParticle2.Vz - rock_Vz);
+
+                    var collisionPoint = newHailParticle1.Get2DCollision(newHailParticle2);
+
+                    if (collisionPoint == null)
+                    {
+                        found = false;
+                        break;
+                    }
+
+                    var t1 = newHailParticle1.HitPointIn(collisionPoint.Value.X, collisionPoint.Value.Y);
+                    var t2 = newHailParticle2.HitPointIn(collisionPoint.Value.X, collisionPoint.Value.Y);
+
+                    if (t1 == null || t2 == null)
+                    {
+                        found = false;
+                        break;
+                    }
+
+                    var z2_low = newHailParticle2.Z + ((newHailParticle2.Vz > 0 ? t2 - 1 : t2 + 1) * newHailParticle2.Vz);
+                    var z2_mid = newHailParticle2.Z + (t2 * newHailParticle2.Vz);
+                    var z2_high = newHailParticle2.Z + ((newHailParticle2.Vz > 0 ? t2 + 1 : t2 - 1) * newHailParticle2.Vz);
+
+                    if (z2_low > z2_mid)
+                        throw new Exception();
+
+                    if (z2_mid > z2_high)
+                        throw new Exception();
+
+                    if (collisionX == null)
+                    {
+                        collisionX = collisionPoint.Value.X;
+                        collisionY = collisionPoint.Value.Y;
+                        collisionZ = z2_mid;
+                    }
+                    else
+                    {
+                        if (Math.Abs(collisionX.Value - collisionPoint.Value.X) > 1 ||
+                            Math.Abs(collisionY.Value - collisionPoint.Value.Y) > 1 ||
+                            collisionZ.Value < z2_low || collisionZ.Value > z2_high)
+                        {
+                            found = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+if (collisionX == null || collisionY == null || collisionZ == null)
+    throw new Exception();
+
+Console.WriteLine($"Part 2 - brute force: x:{collisionX}, y:{collisionY}, z: {collisionZ}");
+Console.WriteLine($"SUM : {collisionX + collisionY + collisionZ}");
+
 // using part 2 to learn about Z3 - new to me - https://github.com/Z3Prover/z3
 
 var context = new Context();
@@ -79,11 +160,13 @@ var model = solver.Model;
 var solution_x = ((RatNum)model.Evaluate(x)).Double;
 var solution_y = ((RatNum)model.Evaluate(y)).Double;
 var solution_z = ((RatNum)model.Evaluate(z)).Double;
-
+var solution_vx = ((RatNum)model.Evaluate(vx)).Double;
+var solution_vy = ((RatNum)model.Evaluate(vy)).Double;
+var solution_vz = ((RatNum)model.Evaluate(vz)).Double;
 
 var final = solution_x + solution_y + solution_z;
 
-Console.WriteLine($"Part 2: x:{solution_x}, y:{solution_y}, z: {solution_z}");
+Console.WriteLine($"Part 2 - Z3 appraoch: x:{solution_x}, y:{solution_y}, z: {solution_z}");
 Console.WriteLine($"SUM : {final}");
 
 static bool GetHailParticle(string? input, out HailParticle? value)
@@ -126,19 +209,36 @@ record HailParticle (double X, double Y, double Z, double Vx, double Vy, double 
 
     public double? HitPointIn(double x, double y)
     {
-        var deltaX = x - this.X;
-        var nX = deltaX / this.Vx;
+        if (this.Vx != 0)
+        {
+            var deltaY = y - this.Y;
+            var nY = deltaY / this.Vy;
 
-        var deltaY = y - this.Y;
-        var nY = deltaY / this.Vy;
+            return Math.Ceiling(nY);
+        }
+        else if (this.Vy != 0)
+        {
+            var deltaX = x - this.X;
+            var nX = deltaX / this.Vx;
 
-        if (Math.Abs(nX - nY) > 1e-1)
-            throw new Exception();
+            return Math.Ceiling(nX);
+        }
 
-        if (nX < 0)
-            return null;
+        return null;
 
-        return Math.Ceiling(nX);
+        //var deltaX = x - this.X;
+        //var nX = deltaX / this.Vx;
+
+        //if (nX < 0)
+        //    return null;
+
+        //var deltaY = y - this.Y;
+        //var nY = deltaY / this.Vy;
+
+        ////if (Math.Abs(nX - nY) > 1)
+        ////    throw new Exception();
+
+        //return Math.Ceiling(nX);
     }
 
     static (double A, double B, double C) GetLineFormula(HailParticle particle)
